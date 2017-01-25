@@ -1,0 +1,18 @@
+Replace this file with the answers to the essay questions here.
+----------------------------------------------------------------------
+
+1. In the homework assignment, we are using character-based ngrams,
+i.e., the gram units are characters. Do you expect token-based ngram
+models to perform better?
+
+2. What do you think will happen if we provided more data for each
+category for you to build the language models? What if we only
+provided more data for Indonesian?
+
+3. What do you think will happen if you strip out punctuations and/or
+numbers? What about converting upper case characters to lower case?
+
+4. We use 4-gram models in this homework assignment. What do you think
+will happen if we varied the ngram size, such as using unigrams,
+bigrams and trigrams?
+
