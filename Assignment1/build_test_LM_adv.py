@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import getopt
 import sys
+import string
 
 from model import Model
 
@@ -140,7 +141,7 @@ for o, a in opts:
     elif o == "--rmspchar":
         invalid_token += ".,:\\/!?_-#"
     elif o == "--inumber":
-        invalid_token += "".join([str(i) for i in range(0, 10)])
+        invalid_token += string.digits
     elif o == "-s":
         smoothing = float(a)
     else:
