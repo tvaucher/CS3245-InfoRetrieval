@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import math
+from collections import defaultdict
 
 
 class Model:
@@ -17,19 +18,9 @@ class Model:
             * smoothing the smoothing to apply. Must be bigger than 0
         """
         assert smoothing > 0
-        self.languages = dict()
-        self.grams = dict()
+        self.languages = defaultdict(int)
+        self.grams = defaultdict(lambda: defaultdict(int))
         self.smoothing = smoothing
-
-    def add_language(self, lang):
-        """
-        Add a new language to the model if it's not included yet
-        ===
-        params
-            * lang the language to add
-        """
-        if lang not in self.languages:
-            self.languages[lang] = 0
 
     def add_gram(self, gram, lang):
         """
@@ -41,12 +32,7 @@ class Model:
             * gram the gram to add
             * lang the language to which the gram belongs
         """
-        if gram not in self.grams:
-            self.grams[gram] = {lang: 1}
-        elif lang not in self.grams[gram]:
-            self.grams[gram][lang] = 1
-        else:
-            self.grams[gram][lang] += 1
+        self.grams[gram][lang] += 1
         self.languages[lang] += 1
 
     def get_log_prob(self, gram, lang):
@@ -63,4 +49,5 @@ class Model:
         if gram not in self.grams:
             return 0, True
         else:
-            return math.log((self.grams[gram].get(lang, 0) + self.smoothing) / (self.languages[lang] + len(self.grams))), False
+            return math.log((self.grams[gram][lang] + self.smoothing)
+                            / (self.languages[lang] + len(self.grams))), False
