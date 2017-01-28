@@ -50,4 +50,4 @@ class Model:
             return 0, True
         else:
             return math.log((self.grams[gram][lang] + self.smoothing)
-                            / (self.languages[lang] + len(self.grams))), False
+                            / (self.languages[lang] + len(self.grams) * self.smoothing)), False
