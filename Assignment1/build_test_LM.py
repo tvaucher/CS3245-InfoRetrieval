@@ -63,7 +63,7 @@ def build_LM(in_file):
         for line in in_file_lines:
             (language, l) = line.split(" ", 1)
             lm.add_language(language)
-            for gram in create_grams(tokenize(line, 0), NGRAM_SIZE):
+            for gram in create_grams(tokenize(line, NGRAM_SIZE - 1), NGRAM_SIZE):
                 lm.add_gram(gram, language)
 
     return lm
@@ -83,7 +83,7 @@ def test_LM(in_file, out_file, LM):
         for line in in_file_lines:
             result = { k : 0 for k in LM.languages.keys()} # stores the language and it's log probability
             ignored_gram, total_gram = 0, 0 # used to calculate the percentage of ignored gram
-            for gram in create_grams(line, NGRAM_SIZE):
+            for gram in create_grams(tokenize(line, NGRAM_SIZE - 1), NGRAM_SIZE):
                 for lang in result.keys():
                     proba, ignored = LM.get_log_prob(gram, lang)
                     if not ignored:
