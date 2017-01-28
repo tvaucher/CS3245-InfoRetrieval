@@ -5,9 +5,10 @@ import sys
 from model import Model
 
 # "Constants" declaration
-NGRAM_SIZE = 4 #Number of tokens per gram
-MAX_IGNORE = 60 #Max percentage of gram to be ignored for a line to be considered inside the model
-INVALID_TOKEN = '\r\n' #Token to ignore during the tokenization
+NGRAM_SIZE = 4  # Number of tokens per gram
+MAX_IGNORE = 60  # Max percentage of gram to be ignored for a line to be considered inside the model
+INVALID_TOKEN = '\r\n'  # Token to ignore during the tokenization
+
 
 def tokenize(line, n):
     """
@@ -21,6 +22,7 @@ def tokenize(line, n):
     assert n >= 0
     return [None] * n + [c for c in line if c not in INVALID_TOKEN] + [None] * n
 
+
 def create_grams(tokens, n):
     """
     Creates an iterable of ngram (n in parameter) for a list of tokens.
@@ -32,6 +34,7 @@ def create_grams(tokens, n):
     """
     assert n > 0
     return zip(*[tokens[i:] for i in range(n)])
+
 
 def get_language(result, ignore_percentage):
     """
@@ -48,6 +51,7 @@ def get_language(result, ignore_percentage):
     else:
         return max(result, key=(lambda x: result[x]))
 
+
 def build_LM(in_file):
     """
     build language models for each label
@@ -56,20 +60,19 @@ def build_LM(in_file):
     print('building language models...')
     # This is an empty method
     # Pls implement your code in below
-    
+
     lm = Model()
 
     with open(in_file, encoding="utf8") as in_file_lines:
         for line in in_file_lines:
             (language, l) = line.split(" ", 1)
-            lm.add_language(language)
             for gram in create_grams(tokenize(l, NGRAM_SIZE - 1), NGRAM_SIZE):
                 lm.add_gram(gram, language)
 
     return lm
 
 
-def test_LM(in_file, out_file, LM):
+def test_LM(in_file, out_file, lm):
     """
     test the language models on new strings
     each line of in_file contains a string
@@ -81,17 +84,20 @@ def test_LM(in_file, out_file, LM):
 
     with open(in_file, encoding="utf8") as in_file_lines, open(out_file, mode="w", encoding="utf8") as out:
         for line in in_file_lines:
-            result = { k : 0 for k in LM.languages.keys()} # stores the language and it's log probability
-            ignored_gram, total_gram = 0, 0 # used to calculate the percentage of ignored gram
+            # stores the language and it's log probability
+            result = {k: 0 for k in lm.languages.keys()}
+            ignored_gram, total_gram = 0, 0  # used to calculate the percentage of ignored gram
             for gram in create_grams(tokenize(line, NGRAM_SIZE - 1), NGRAM_SIZE):
                 for lang in result.keys():
-                    proba, ignored = LM.get_log_prob(gram, lang)
+                    proba, ignored = lm.get_log_prob(gram, lang)
                     if not ignored:
                         result[lang] += proba
                     else:
                         ignored_gram += 1
                     total_gram += 1
-            print(get_language(result, float(ignored_gram/total_gram*100)), line, end="", file=out)
+            print(get_language(result, float(ignored_gram /
+                                             total_gram * 100)), line, end="", file=out)
+
 
 def usage():
     print("usage: " +
@@ -112,7 +118,7 @@ for o, a in opts:
         output_file = a
     else:
         assert False, "unhandled option"
-if input_file_b == None or input_file_t == None or output_file == None:
+if input_file_b is None or input_file_t is None or output_file is None:
     usage()
     sys.exit(2)
 
