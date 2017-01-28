@@ -1,2 +1,4 @@
 .vscode
 Test
+input.predict*
+__pycache__
