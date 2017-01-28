@@ -63,7 +63,7 @@ def build_LM(in_file):
         for line in in_file_lines:
             (language, l) = line.split(" ", 1)
             lm.add_language(language)
-            for gram in create_grams(tokenize(line, NGRAM_SIZE - 1), NGRAM_SIZE):
+            for gram in create_grams(tokenize(l, NGRAM_SIZE - 1), NGRAM_SIZE):
                 lm.add_gram(gram, language)
 
     return lm
