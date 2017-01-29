@@ -3,7 +3,7 @@ import getopt
 import sys
 import string
 
-from model import Model
+from model import LanguageModel
 
 # "Constants" declaration
 MAX_IGNORE = 60  # Max percentage of gram to be ignored for a line to be considered inside the model
@@ -69,7 +69,7 @@ def build_LM(in_file):
     # This is an empty method
     # Pls implement your code in below
 
-    lm = Model(smoothing)
+    lm = LanguageModel(smoothing)
 
     with open(in_file, encoding="utf8") as in_file_lines:
         for line in in_file_lines:

@@ -3,7 +3,7 @@ import math
 from collections import defaultdict
 
 
-class Model:
+class LanguageModel:
     """
     Class that implements the Language Model.
     Allows to flexibly add a new language and new grams

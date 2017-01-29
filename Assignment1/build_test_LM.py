@@ -2,7 +2,7 @@
 import getopt
 import sys
 
-from model import Model
+from model import LanguageModel
 
 # "Constants" declaration
 NGRAM_SIZE = 4  # Number of tokens per gram
@@ -52,7 +52,7 @@ def get_language(result: dict, ignore_percentage: float) -> str:
         return max(result, key=(lambda x: result[x]))
 
 
-def build_LM(in_file: str) -> Model:
+def build_LM(in_file: str) -> LanguageModel:
     """
     build language models for each label
     each line in in_file contains a label and a string separated by a space
@@ -61,7 +61,7 @@ def build_LM(in_file: str) -> Model:
     # This is an empty method
     # Pls implement your code in below
 
-    lm = Model()
+    lm = LanguageModel()
 
     with open(in_file, encoding="utf8") as in_file_lines:
         for line in in_file_lines:
@@ -72,7 +72,7 @@ def build_LM(in_file: str) -> Model:
     return lm
 
 
-def test_LM(in_file: str, out_file: str, lm: Model):
+def test_LM(in_file: str, out_file: str, lm: LanguageModel):
     """
     test the language models on new strings
     each line of in_file contains a string
