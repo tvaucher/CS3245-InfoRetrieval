@@ -10,7 +10,7 @@ class Model:
     Supports smoothing (default: add 1 smoothing)
     """
 
-    def __init__(self, smoothing=1):
+    def __init__(self, smoothing: float=1):
         """
         Creates the Language Model
         ===
@@ -22,7 +22,7 @@ class Model:
         self.grams = defaultdict(lambda: defaultdict(int))
         self.smoothing = smoothing
 
-    def add_gram(self, gram, lang):
+    def add_gram(self, gram: str, lang: str):
         """
         Add a gram entry in the Language model
         Increment the specified gram count
@@ -35,7 +35,7 @@ class Model:
         self.grams[gram][lang] += 1
         self.languages[lang] += 1
 
-    def get_log_prob(self, gram, lang):
+    def get_log_prob(self, gram: str, lang: str) -> float:
         """
         Get the logarithmitic probability for a specified gram in a specified language
         ===

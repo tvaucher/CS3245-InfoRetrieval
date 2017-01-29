@@ -10,7 +10,7 @@ MAX_IGNORE = 60  # Max percentage of gram to be ignored for a line to be conside
 INVALID_TOKEN = '\r\n'  # Token to ignore during the tokenization
 
 
-def tokenize(line, n):
+def tokenize(line: str, n: int) -> list:
     """
     Creates a list of tokens (character based) with a padding at the beginning and the end
     ===
@@ -23,7 +23,7 @@ def tokenize(line, n):
     return [None] * n + [c for c in line if c not in INVALID_TOKEN] + [None] * n
 
 
-def create_grams(tokens, n):
+def create_grams(tokens: list, n: int) -> zip:
     """
     Creates an iterable of ngram (n in parameter) for a list of tokens.
     ===
@@ -36,7 +36,7 @@ def create_grams(tokens, n):
     return zip(*[tokens[i:] for i in range(n)])
 
 
-def get_language(result, ignore_percentage):
+def get_language(result: dict, ignore_percentage: float) -> str:
     """
     Finds the most probable language in a dict of (language, log. probability of the language)
     If the percentage of ignored ngrams was too big, the language of the entry is probably not included
@@ -52,7 +52,7 @@ def get_language(result, ignore_percentage):
         return max(result, key=(lambda x: result[x]))
 
 
-def build_LM(in_file):
+def build_LM(in_file: str) -> Model:
     """
     build language models for each label
     each line in in_file contains a label and a string separated by a space
@@ -72,7 +72,7 @@ def build_LM(in_file):
     return lm
 
 
-def test_LM(in_file, out_file, lm):
+def test_LM(in_file: str, out_file: str, lm: Model):
     """
     test the language models on new strings
     each line of in_file contains a string
