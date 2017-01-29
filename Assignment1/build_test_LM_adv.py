@@ -1,7 +1,8 @@
 #!/usr/bin/python
 import getopt
-import sys
 import string
+import sys
+from typing import Dict, Iterable, List
 
 from model import LanguageModel
 
@@ -15,7 +16,7 @@ transform_line = lambda x: x  # Lambda to transform the text
 smoothing = 1.  # Smoothing
 
 
-def tokenize(line, n):
+def tokenize(line: str, n: int) -> List[str]:
     """
     Creates a list of tokens (character based) with a padding at the beginning and the end
     ===
@@ -30,7 +31,7 @@ def tokenize(line, n):
 tokenizer = tokenize
 
 
-def create_grams(tokens, n):
+def create_grams(tokens: Iterable[str], n: int) -> Iterable[str]:
     """
     Creates an iterable of ngram (n in parameter) for a list of tokens.
     ===
@@ -43,7 +44,7 @@ def create_grams(tokens, n):
     return zip(*[tokens[i:] for i in range(n)])
 
 
-def get_language(result, ignore_percentage):
+def get_language(result: Dict[str, int], ignore_percentage: float) -> str:
     """
     Finds the most probable language in a dict of (language, log. probability of the language)
     If the percentage of ignored ngrams was too big,
@@ -60,7 +61,7 @@ def get_language(result, ignore_percentage):
         return max(result, key=(lambda x: result[x]))
 
 
-def build_LM(in_file):
+def build_LM(in_file: str) -> LanguageModel:
     """
     build language models for each label
     each line in in_file contains a label and a string separated by a space
@@ -80,7 +81,7 @@ def build_LM(in_file):
     return lm
 
 
-def test_LM(in_file, out_file, lm):
+def test_LM(in_file: str, out_file: str, lm: LanguageModel):
     """
     test the language models on new strings
     each line of in_file contains a string
@@ -117,7 +118,8 @@ def usage():
 
 input_file_b = input_file_t = output_file = None
 try:
-    opts, args = getopt.getopt(sys.argv[1:], 'b:t:o:n:p:s:', ["words", "lower", "rmspchar", "inumber"])
+    opts, args = getopt.getopt(sys.argv[1:], 'b:t:o:n:p:s:',
+                               ["words", "lower", "rmspchar", "inumber"])
 except getopt.GetoptError as err:
     usage()
     sys.exit(2)

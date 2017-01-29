@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import getopt
 import sys
+from typing import Dict, Iterable, List
 
 from model import LanguageModel
 
@@ -10,7 +11,7 @@ MAX_IGNORE = 60  # Max percentage of gram to be ignored for a line to be conside
 INVALID_TOKEN = '\r\n'  # Token to ignore during the tokenization
 
 
-def tokenize(line: str, n: int) -> list:
+def tokenize(line: str, n: int) -> List[str]:
     """
     Creates a list of tokens (character based) with a padding at the beginning and the end
     ===
@@ -23,7 +24,7 @@ def tokenize(line: str, n: int) -> list:
     return [None] * n + [c for c in line if c not in INVALID_TOKEN] + [None] * n
 
 
-def create_grams(tokens: list, n: int) -> zip:
+def create_grams(tokens: Iterable[str], n: int) -> Iterable[str]:
     """
     Creates an iterable of ngram (n in parameter) for a list of tokens.
     ===
@@ -36,7 +37,7 @@ def create_grams(tokens: list, n: int) -> zip:
     return zip(*[tokens[i:] for i in range(n)])
 
 
-def get_language(result: dict, ignore_percentage: float) -> str:
+def get_language(result: Dict[str, int], ignore_percentage: float) -> str:
     """
     Finds the most probable language in a dict of (language, log. probability of the language)
     If the percentage of ignored ngrams was too big, the language of the entry is probably not included
@@ -82,7 +83,8 @@ def test_LM(in_file: str, out_file: str, lm: LanguageModel):
     # This is an empty method
     # Pls implement your code in below
 
-    with open(in_file, encoding="utf8") as in_file_lines, open(out_file, mode="w", encoding="utf8") as out:
+    with open(in_file, encoding="utf8") as in_file_lines, \
+            open(out_file, mode="w", encoding="utf8") as out:
         for line in in_file_lines:
             # stores the language and it's log probability
             result = {k: 0 for k in lm.languages.keys()}
