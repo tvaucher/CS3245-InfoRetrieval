@@ -5,14 +5,67 @@ Replace this file with the answers to the essay questions here.
 i.e., the gram units are characters. Do you expect token-based ngram
 models to perform better?
 
+No. Token-based ngram are better for "while typing" prediction that you expect
+your phone to be doing while you're typing your message. But to identify a language
+we don't need the context provided by ngram (n > 1), because each language don't
+share the same vocabulary so a unigram token-based model could do it if it's given
+a very big training set (and in this case we should remove smoothing because there's
+no probability that a word would appear in the other language).
+
+Because, if we look into our case our input dataset is too small to cover every word
+of each language we have (just try with the adv file, the normal params + "--words -n 1 -s 1e-6")
+We can see that very often we ignore a enormous percentage of the words (and that's just because we've never seen them)
+
+On the other hand, character-based ngrams represents the frequency of such characters (with context)
+in a certain language, which can lead to a decent way to identify a language.
+
 2. What do you think will happen if we provided more data for each
 category for you to build the language models? What if we only
 provided more data for Indonesian?
 
+If we have more data over all it should increase the precision of the apparition of each gram
+for a language, leading to a possible improvement on bigger dataset.
+
+The impact of having more data for only one language should increase the precision on that language.
+While probability slighlty increasing the number of our vocabulary, it should not affect the others.
+I assume that in the 900 lines provided, we see most of the possible ngram for that language
+
 3. What do you think will happen if you strip out punctuations and/or
 numbers? What about converting upper case characters to lower case?
+
+We then take only what's very important to the language itself as the punctuation/numbers
+are commonly shared among different language. For most language converting to lower case
+can be interesting as we are interested in the frequency and not the context of being in
+the beginning of the sentence.
+
+But, for some language it can be interesting to keep it. E.g : Spanish has some unique punctuation
+namely the reversed question mark, not shared by many other language. German uses capitalization
+to mark the beginning of a noun.
+
+You can check the improvement (on a bigger dataset) by using the advance version
+and providing possible combination of args :
+--lower for lower case transformation
+--rmspchar to remove some special characters (mainly punctuation)
+--inumber to ignore number
 
 4. We use 4-gram models in this homework assignment. What do you think
 will happen if we varied the ngram size, such as using unigrams,
 bigrams and trigrams?
 
+When we reduce n, we lose information about the order of the caracter.
+For e.g (a, t) and (t, a) are different in a bigram model but we can't model that
+using a unigram model. And we can say the same from a bigram model to a trigram model.
+
+Experimentally :
+n = 1: accuracy: 9 / 20 (45.0%)
+n = 2: accuracy: 15 / 20 (75.0%)
+n = 3: accuracy: 19 / 20 (95.0%)
+n = 4: accuracy: 20 / 20 (100.0%)
+n = 8: accuracy: 11 / 20 (55.0%)
+
+As one could expect, unigram model performs very badly as it's based on the frequency of a single character.
+We can already see a huge improvement in the bigram model as we add some context, and it gets better
+when we reasonably increase n. Because, interestingly if n gets too big, first our LM size
+increase exponentially but we greatly reduce the probability of each ngram and we start to ignore
+many grams because we have never seen them before. A bigger dataset could potentially help but
+having n = 4 or 5 is sufficient enough with the data we have.

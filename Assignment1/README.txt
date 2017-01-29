@@ -5,7 +5,7 @@ This is the README file for A0153040Y's submission
 /!\ Please note that this code is written in Python 3.6 and isn't Python 2.7.X (or below 3.5) compatible
 
 Creation of the ngram :
-    I decided to go for padding using None, during the creation of the grams (see more in Essay). The grams are created by zipping the list of tokens with itself
+    I decided to go for padding using None, during the creation of the grams. The grams are created by zipping the list of tokens with itself
 
 LanguageModel :
     The language model is abstracted in a class which allows a user to add a gram for a specified language and retrieve is probability.
