@@ -12,7 +12,7 @@ LanguageModel :
     It's basically containing 2 dict. One to keep track of the different language present in the LM and the number of ngrams belonging to it. The other one use the gram as a key and contains the number of occurence of the gram for a given language.
     Actually those are defaultdict to reduce the number of line written in checking whether the key is in or not whatsoever (it'd like to provide my github to show the improvement but I guess it's not feasible :p). But mostly it provides flexibility ! You can decide to feed it any language you want. You're not limited to the 3 languages of this assignment, which makes it Reusable !
 
-On predicition :
+On identification :
     As suggested by prof Min, I use log based probability with on-the-fly computation to calculate my predicition.
     As we are summing negative log probability, the least negative (aka biggest) should be selected.
     But we have alien languages, I keep track of the number of ngram we ignored and if the percentage is above a cst (MAX_IGNORE = 60) we consider the language to be one that isn't contained in the LM.
