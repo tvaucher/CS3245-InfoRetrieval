@@ -56,7 +56,7 @@ When we reduce n, we lose information about the order of the caracter.
 For e.g (a, t) and (t, a) are different in a bigram model but we can't model that
 using a unigram model. And we can say the same from a bigram model to a trigram model.
 
-Experimentally :
+Experimentally : (using the adv version and -n size args)
 n = 1: accuracy: 9 / 20 (45.0%)
 n = 2: accuracy: 15 / 20 (75.0%)
 n = 3: accuracy: 19 / 20 (95.0%)
