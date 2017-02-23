@@ -2,7 +2,6 @@ import sys
 import re
 from typing import Iterable, List
 from nltk.stem import PorterStemmer
-from collections import deque
 from tree import Tree, Node, Leaf
 
 OPERATORS = {'(': 0, ')': 0, 'AND': 2, 'OR': 1, 'NOT': 3}
@@ -65,5 +64,3 @@ def shunting_yard_AST(tokens: Iterable[str]) -> Iterable[str]:
         else:
             addNode(output, stack.pop())
     return output.pop()
-
-print(shunting_yard_AST(tokenize("Bill OR Gates OR (vista OR (XP AND NOT Dell))")))
