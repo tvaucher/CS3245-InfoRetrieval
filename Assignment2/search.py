@@ -4,6 +4,7 @@ from tuple_type import Dictionary, Entry
 from posting import Posting
 from query import shunting_yard_AST, tokenize
 from tree import Tree
+from skiplist import Skiplist
 
 try:
     import cPickle as pickle
@@ -16,7 +17,8 @@ def search(dict_file, post_file, query_in, query_out):
     open(query_in, encoding="utf8") as q_in,\
     open(query_out, mode="w", encoding="utf8") as q_out:
         dictionary = pickle.load(dictionary_file)
-        posting = Posting(dictionary.dict, postings_file)
+        posting = Posting(dictionary, postings_file)
+        file_list = posting['__all__']
         first = True
         for query in q_in:
             if not first:
@@ -24,7 +26,7 @@ def search(dict_file, post_file, query_in, query_out):
             else:
                 first = False
             print(" ".join(map(str, shunting_yard_AST(tokenize(query))
-                  .eval(posting, dictionary.file_list))), end="", file=q_out)
+                  .eval(posting, file_list))), end="", file=q_out)
 def usage():
     """
     Print the usage of `search`
