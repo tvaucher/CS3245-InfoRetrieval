@@ -15,6 +15,7 @@ import os
 import shelve
 import sys
 import time
+import re
 from tuple_type import Dictionary, Entry
 from typing import Dict, Iterable, List, Set
 
@@ -53,7 +54,8 @@ def generate_token(in_file: str) -> Set[str]:
     """
     with open(in_file, encoding="utf8") as file:
         return {STEMMER.stem(w.lower()) for w in
-                {word for sent in sent_tokenize(file.read()) for word in word_tokenize(sent)}}
+                {word for sent in sent_tokenize(re.sub("[-']", " ", file.read()))
+                 for word in word_tokenize(sent)}}
 
 
 def add_token(shelf: shelve.Shelf, token: str, in_file: int):
@@ -103,7 +105,8 @@ def index(directory: str, dict_file: str, post_file: str):
     """
     tempFilename = 'tmp' + str(int(time.time()))
     with shelve.open(tempFilename, flag="n") as shelf:
-        file_list = get_file_list(directory)[:10]
+        file_list = get_file_list(directory)#[:10]
+        shelf['__all__'] = file_list
         # Generate Dict
         for in_file in file_list:
             for token in generate_token(directory + in_file):
@@ -119,7 +122,7 @@ def index(directory: str, dict_file: str, post_file: str):
 
         # Write Dictionary
         with open(dict_file, mode="wb") as dictionary_file:
-            pickle.dump(Dictionary(file_list, dictionary), dictionary_file)
+            pickle.dump(dictionary, dictionary_file)
 
     cleanup(tempFilename)
 
