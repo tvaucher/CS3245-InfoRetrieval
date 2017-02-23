@@ -1,5 +1,5 @@
 from posting import Posting
-from itertools import islice
+from skiplist import Skiplist
 
 class Tree(object):
     def __init__(self, left, right, value):
@@ -37,56 +37,41 @@ class Leaf(Tree):
     def __str__(self):
         return '[L ' + self.value + ']'
 
-def and_merge(l1, l2, step1=1, step2=1):
-    # print("AND", l1, l2)
+def and_merge(l1, l2):
     out = []
     if (len(l1) == 0 or len(l2) == 0):
-        return out
-    #skip1 = islice(l1, step1, None, step1)
-    #skip2 = islice(l2, step2, None, step2)
+        return Skiplist(out)
     i1, i2 = iter(l1), iter(l2)
-    e1, e2 = next(i1, False), next(i2, False)
-    #s1, s2 = next(skip1, l1[-1]), next(skip2, l2[-1])
-    while e1 and e2:
-        if e1 == e2:
-            out.append(e1)
-            #if e1 == s1:
-            #    s1 = next(skip1, l1[-1])
-            #if e2 == s2:
-            #    s2 = next(skip2, l2[-1])
-            e1, e2 = next(i1, False),next(i2, False)
-        elif e1 < e2:
-            #if (s1 <= e2):
-            #    while (e1 < s1):
-            #        print(f"l1 : skipping {e1} to {s1}")
-            #        e1 = next(i1)
-            #    s1 = next(skip1, l1[-1])
-            e1 = next(i1, False)
-        else:
-            #if (s2 <= e1):
-            #    while (e2 < s2):
-            #        print(f"l2 : skipping {e2} to {s2}")
-            #        e2 = next(i2)
-            #    s2 = next(skip2, l2[-1])
-            e2 = next(i2, False)
-    return out
+    try:
+        e1, e2 = next(i1, False), next(i2, False)
+        while e1 and e2:
+            if e1 == e2:
+                out.append(e1)
+                e1, e2 = next(i1, False),next(i2, False)
+            elif e1 < e2:
+                e1 = i1.__next__(e2)
+            else:
+                e2 = i2.__next__(e1)
+    except StopIteration:
+        print("StopIteration")
+    
+    return Skiplist(out)
 
-def or_merge(l1, l2):
-    print("OR", l1, l2)
+def or_merge(l1: Skiplist, l2: Skiplist):
     out = []
-    i1, i2 = iter(l1), iter(l2)
+    i1, i2 = iter(l1.list), iter(l2.list)
     e1, e2 = next(i1, False), next(i2, False)
     while e1 and e2:
         if e1 == e2:
             out.append(e1)
-            e1, e2 = next(i1, False),next(i2, False)
+            e1, e2 = next(i1, False), next(i2, False)
         elif e1 < e2:
             out.append(e1)
             e1 = next(i1, False)
         else:
             out.append(e2)
             e2 = next(i2, False)
-    if e1 :
+    if e1:
         out.append(e1)
         for e in i1:
             out.append(e)
@@ -95,12 +80,11 @@ def or_merge(l1, l2):
         for e in i2:
             out.append(e)
 
-    return out
+    return Skiplist(out)
 
-def not_merge(l1, l2):
-    # print("NOT", l1)
+def not_merge(l1: Skiplist, l2: Skiplist):
     out = []
-    i1, i2 = iter(l1), iter(l2)
+    i1, i2 = iter(l1.list), iter(l2.list)
     e1, e2 = next(i1, False), next(i2, False)
     while e1 and e2:
         if e1 == int(e2):
@@ -114,4 +98,5 @@ def not_merge(l1, l2):
         out.append(int(e2))
         for e in i2:
             out.append(int(e))
-    return out
+
+    return Skiplist(out)

@@ -1,4 +1,5 @@
 import sys
+from skiplist import Skiplist
 try:
     import cPickle as pickle
 except:
@@ -14,6 +15,6 @@ class Posting(object):
         if item in self.dictionary:
             value = self.dictionary[item]
             self.post_file.seek(value.offset)
-            return pickle.loads(self.post_file.read(value.size))
+            return Skiplist(pickle.loads(self.post_file.read(value.size)))
         else:
-            return []
+            return Skiplist([])
