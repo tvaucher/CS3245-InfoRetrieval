@@ -23,7 +23,7 @@ def addNode(output, operator):
     else:
         output.append(Node(output.pop(), None, operator))
 
-def shunting_yard_AST(tokens: Iterable[str]) -> Iterable[str]:
+def shunting_yard_AST(tokens: Iterable[str]) -> Tree:
     """
     1. read token
     - if operands => queue
@@ -33,6 +33,8 @@ def shunting_yard_AST(tokens: Iterable[str]) -> Iterable[str]:
     2. when no more token
     - if still some tokens (but parenthesis => error) => queue
     """
+    if len(tokens) == 0:
+        return Leaf('__Empty__')
     output = []
     stack = []
     for token in tokens:
