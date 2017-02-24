@@ -5,6 +5,7 @@ from posting import Posting
 from query import shunting_yard_AST, tokenize
 from tree import Tree
 from skiplist import Skiplist
+import time
 
 try:
     import cPickle as pickle
@@ -39,6 +40,7 @@ def main():
     """
     Main fonction of the module, check the argv and pass them to the index function
     """
+    t = time.perf_counter()
     dict_file = post_file = query_in = query_out = None
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'd:p:q:o:')
@@ -59,7 +61,12 @@ def main():
     if dict_file is None or post_file is None or query_in is None or query_out is None:
         usage()
         sys.exit(2)
+    print("read arg time", time.perf_counter() - t, "sec")
+    t = time.perf_counter()
     search(dict_file, post_file, query_in, query_out)
+    print("search time", time.perf_counter() - t, "sec")
 
 if __name__ == '__main__':
+    t = time.perf_counter()
     main()
+    print("main time", time.perf_counter() - t, "sec")
