@@ -1,18 +1,33 @@
-import sys
+"""
+This module is the core of the second part of the assignment and allows to perform
+the queries contained in a files using a dictionary and a postings file as well
+as a AST logic in order to evaluate the queries
+"""
+
 import getopt
-from tuple_type import Dictionary, Entry
+import sys
+# import time
+
 from posting import Posting
 from query import shunting_yard_AST, tokenize
-from tree import Tree
-from skiplist import Skiplist
-import time
 
 try:
     import cPickle as pickle
-except:
+except ImportError:
     import pickle
 
-def search(dict_file, post_file, query_in, query_out):
+def search(dict_file: str, post_file: str, query_in: str, query_out: str):
+    """
+    Open all the file and the load the dictionary and the list of all the documents id
+    Then, parse each query and create the respective AST that can evaluate itself
+    Finally, print the query result in the out file
+
+    *params*
+        - dict_file The filename of the dictionary file
+        - post_file The filename of the postings file
+        - query_in The filename of the query file
+        - query_out The filename of the output file
+    """
     with open(dict_file, mode="rb") as dictionary_file,\
     open(post_file, mode="rb") as postings_file,\
     open(query_in, encoding="utf8") as q_in,\
@@ -23,28 +38,28 @@ def search(dict_file, post_file, query_in, query_out):
         first = True
         for query in q_in:
             if not first:
-                print("\n", end="", file=q_out)
+                q_out.write("\n")
             else:
                 first = False
-            print(" ".join(map(str, shunting_yard_AST(tokenize(query))
-                  .eval(posting, file_list))), end="", file=q_out)
+            q_out.write(" ".join(map(str, shunting_yard_AST(tokenize(query))
+                                     .eval(posting, file_list).list)))
 def usage():
     """
     Print the usage of `search`
     """
-    print("usage: " +
-          sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results")
+    print("usage: " + sys.argv[0] +
+          " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results")
 
 
 def main():
     """
     Main fonction of the module, check the argv and pass them to the index function
     """
-    t = time.perf_counter()
+
     dict_file = post_file = query_in = query_out = None
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'd:p:q:o:')
-    except getopt.GetoptError as err:
+    except getopt.GetoptError:
         usage()
         sys.exit(2)
     for o, a in opts:
@@ -61,12 +76,10 @@ def main():
     if dict_file is None or post_file is None or query_in is None or query_out is None:
         usage()
         sys.exit(2)
-    print("read arg time", time.perf_counter() - t, "sec")
-    t = time.perf_counter()
+
+    # t = time.perf_counter()
     search(dict_file, post_file, query_in, query_out)
-    print("search time", time.perf_counter() - t, "sec")
+    # print("search time", time.perf_counter() - t, "sec")
 
 if __name__ == '__main__':
-    t = time.perf_counter()
     main()
-    print("main time", time.perf_counter() - t, "sec")

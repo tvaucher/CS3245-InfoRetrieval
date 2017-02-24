@@ -1,17 +1,42 @@
-import sys
+"""
+Module containing a datastructure based on a dictionary (Decorator pattern)
+in order to get the value of the dictionary from the disk as you would do it
+for a normal dictionary.
+"""
+
+from typing import Dict
+
 from skiplist import Skiplist
+from tuple_type import Entry
+
 try:
     import cPickle as pickle
-except:
+except ImportError:
     import pickle
 
 
 class Posting(object):
-    def __init__(self, dicionary, post_file):
+    """
+    Class representing the Posting dictionary
+    can access the postings on disk for a given entry
+    """
+
+    def __init__(self, dicionary: Dict[str, Entry], post_file):
+        """
+        Initialize the datastructure given the dicionary and the postings file
+
+        *params*
+        - dictionary The dictionary mapping the key to a disk Entry
+        - post_file The file (already open) containing the postings
+        """
         self.dictionary = dicionary
         self.post_file = post_file
-    
-    def __getitem__(self, item):
+
+    def __getitem__(self, item: str) -> Skiplist:
+        """
+        Return the associated Skiplist to a key or an empty Skiplist
+        if there's no mapping in the dictionary
+        """
         if item in self.dictionary:
             value = self.dictionary[item]
             self.post_file.seek(value.offset)

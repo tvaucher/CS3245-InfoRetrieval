@@ -16,7 +16,7 @@ import shelve
 import sys
 import time
 import re
-from tuple_type import Dictionary, Entry
+from tuple_type import Entry
 from typing import Dict, Iterable, List, Set
 
 from nltk.stem import PorterStemmer
@@ -24,48 +24,49 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 
 try:
     import cPickle as pickle
-except:
+except ImportError:
     import pickle
 
 DELIMITER = '/'
 STEMMER = PorterStemmer()
 
-def get_file_list(directory: str) -> Iterable[str]:
+
+def get_file_list(directory: str) -> Iterable[int]:
     """
     Create a sorted list of the files inside a directory
-    ===
-    params:
-        directory: The directory to list the FileExistsError
-    return:
-        A sorted Iterable[str] containing the namefiles
+
+    *params*:
+        - directory: The directory to list the FileExistsError
+    *return*:
+        - A sorted Iterable[int] containing the namefiles
     """
-    return sorted(os.listdir(directory), key=int)
+    return sorted(map(int, os.listdir(directory)))
 
 
 def generate_token(in_file: str) -> Set[str]:
     """
     Generate the token for a specified file to be added in the Dictionary/Postings.
     Reads the file then apply tokenization (sentence, word), case folding and stemming
-    ===
-    params:
-        in_file: The file to generate the token for
-    return:
-        A Set[str] of the unique element to be added
+
+    *params*:
+        - in_file: The file to generate the token for
+    *return*:
+        - A Set[str] of the unique element to be added
     """
     with open(in_file, encoding="utf8") as file:
         return {STEMMER.stem(w.lower()) for w in
-                {word for sent in sent_tokenize(re.sub("[-']", " ", file.read()))
+                {word for sent in sent_tokenize(file.read())  # (re.sub("[-']", " ", file.read()))
                  for word in word_tokenize(sent)}}
 
 
 def add_token(shelf: shelve.Shelf, token: str, in_file: int):
     """
     Add a specified token from a specified file in the temporary shelf
-    ===
-    params:
-        shelf: The temporary shelf to add into
-        token: The token to add into the shelf
-        in_file: The file to which belong the token
+
+    *params*:
+        - shelf: The temporary shelf to add into
+        - token: The token to add into the shelf
+        - in_file: The file to which belong the token
     """
     if token not in shelf:
         shelf[token] = [in_file]
@@ -78,9 +79,9 @@ def add_token(shelf: shelve.Shelf, token: str, in_file: int):
 def cleanup(tempFilename: str):
     """
     cleanup the temporary shelf
-    ===
-    params:
-        tempFilename: The filename of the shelf
+
+    *params*:
+        - tempFilename: The filename of the shelf
     """
     try:
         os.remove(tempFilename + ".bak")
@@ -97,20 +98,20 @@ def index(directory: str, dict_file: str, post_file: str):
     and of the entries (with their frequency, offset in the postings and size (in bytes))
     Whereas the Postings file stores the list of lists of documents. The postings are useless
     without the Dictonary.
-    ===
-    params:
-        directory: The directory containing the file to index
-        dict_file: The file that will contain the Dictionary
-        post_file: The file that will contain the Postings
+
+    *params*:
+        - directory: The directory containing the file to index
+        - dict_file: The file that will contain the Dictionary
+        - post_file: The file that will contain the Postings
     """
     tempFilename = 'tmp' + str(int(time.time()))
     with shelve.open(tempFilename, flag="n") as shelf:
-        file_list = get_file_list(directory)#[:10]
+        file_list = get_file_list(directory)  # [:10]
         shelf['__all__'] = file_list
         # Generate Dict
         for in_file in file_list:
-            for token in generate_token(directory + in_file):
-                add_token(shelf, token, int(in_file))
+            for token in generate_token(directory + str(in_file)):
+                add_token(shelf, token, in_file)
 
         # Write Postings
         dictionary = dict()

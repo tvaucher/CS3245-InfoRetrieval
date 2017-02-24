@@ -8,6 +8,6 @@
     - [X] De Morgan
 - [X] Better tokenization ? `-` and `'` => how to treat those
 - [X] Store the all documents list in the postings file
-- [ ] Doc / further testing
+- [X] Doc / further testing
 - [ ] ESSAY
 - [ ] README
