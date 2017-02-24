@@ -29,12 +29,6 @@ class Skiplist(object):
         self.step = int(math.floor(math.sqrt(self.frequency)))
         self.i = 0
 
-    def __len__(self) -> int:
-        """
-        Returns the length of the underlying list
-        """
-        return self.frequency
-
     def __iter__(self) -> Iterator:
         """
         Initialize and return the iterator on the list
