@@ -11,11 +11,19 @@ class Tree(object):
         left = self.left.eval(dictionary, all_entry)
         if self.right: right = self.right.eval(dictionary, all_entry)
         if self.value == 'AND':
+            if self.left.value == 'NOT' and self.right.value == 'NOT':
+                # NOT a AND NOT b => De Morgan's law NOT (a OR b)
+                return not_merge(or_merge(self.left.left.eval(dictionary, all_entry),
+                                          self.right.left.eval(dictionary, all_entry)), all_entry)
             return and_merge(left, right)
         elif self.value == 'OR':
-            return or_merge(left, right)
+            if self.left.value == 'NOT' and self.right.value == 'NOT':
+                # NOT a OR NOT b => De Morgan's law NOT (a AND b)
+                return not_merge(and_merge(self.left.left.eval(dictionary, all_entry),
+                                          self.right.left.eval(dictionary, all_entry)), all_entry)
+            return or_merge(self.left.eval(dictionary, all_entry), self.right.eval(dictionary, all_entry))
         else:
-            return not_merge(left, all_entry)
+            return not_merge(self.left.eval(dictionary, all_entry), all_entry)
 
     def __str__(self):
         return '[T ' + self.left.__str__() + ', ' + self.right.__str__() + ', ' + self.value + ']'
@@ -53,7 +61,7 @@ def and_merge(l1, l2):
             else:
                 e2 = i2.__next__(e1)
     except StopIteration:
-        print("StopIteration")
+        pass
     
     return Skiplist(out)
 
