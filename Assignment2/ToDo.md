@@ -9,5 +9,5 @@
 - [X] Better tokenization ? `-` and `'` => how to treat those
 - [X] Store the all documents list in the postings file
 - [X] Doc / further testing
-- [ ] ESSAY
+- [X] ESSAY
 - [ ] README

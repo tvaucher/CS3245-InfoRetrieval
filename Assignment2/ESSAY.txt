@@ -1,0 +1,22 @@
+=== ESSAY QUESTIONS ===
+
+1. You will observe that a large portion of the terms in the dictionary are numbers. However, we normally do not use numbers as query terms to search. Do you think it is a good idea to remove these number entries from the dictionary and the postings lists? Can you propose methods to normalize these numbers? How many percentage of reduction in disk storage do you observe after removing/normalizing these numbers?
+
+I indeed think it's a good idea, as we barely never look for numbers. Then as well, a quick look inside the current dictionary reveals that the numbers are in an (almost) infinite format, space, dot, dash, slash, comma separated. A way to normalize it (if we really want to keep them), would be to use a first Regex to match the number (but not dates, that are to be taken care of as well), and then remove all those separators in order to index only the number itself. Then, we would also need to take care of while parsing queries to remove the user separators in order to search for the number in it's plain form.
+
+But in the case where we want to remove all those numbers, a quick look at essay.py results show that numbers actually plague the dictionary, acounting for more than 40% of the entries ! If we look at the posting disk space it reprents 300 ko of data.
+Thus, we can say than removing the numbers provides a 40% shrinking of the dictionary and roughly 1/7 shrinking of the postings, which is clearly non neglegtable.
+
+2. What do you think will happen if we remove stop words from the dictionary and postings file? How does it affect the searching phase?
+
+A quick look at essay.py results show that almost all the english stopwords are present in our dictionary, but only acount for 129 entries, less than 0.4% of the dictionary. But they take 340 ko of the postings file, which implies that removing them reprents a 17% shrinking of my 2 Mo postings file.
+
+But, not having them (the same apply for number) means that we have to take care of them in the queries as they may potentially break the results (i.e. empty results). A simple solution would be to simply ignore the operations that contains a stop word, e.g cool_term AND stopword would simply become cool_term. This step can either be done at the parsing stage or the evaluation stage (e.g. by ignoring the Leaves that contains a stopword)
+
+3. The NLTK tokenizer may not correctly tokenize all terms. What do you observe from the resulting terms produced by sent_tokenize() and word_tokenize()? Can you propose rules to further refine these results?
+
+The tokenizer generally do a decent jobs separating the tokens, but I found two points where it struggles:
+- Due to the nature of our data, there's a lot of \n in the files. While generally doing ok with those, it painfully fails at tokenizing "government's\nbusiness" and the like, the output is government', busi after stemming. One can see that the indesirable hypen prevents a good stemming and a good indexation. Especially that hypens don't carry aren't really interesing to store by themselves.
+- The other problem is more english related. All the words with a dash (e.g. director-general) are not separated and hence are stored in a weird not very useful stemmed form (e.g. director-gener). I think it would be more interesing to store director and general indepently rather than with the dash.
+
+Hence a simple solution lies in preprocessing the data. Simply replace the hypens and dashes by spaces, and the 2 previous issues are completly automatically fixed by the normal tokenizer.
