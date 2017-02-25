@@ -69,3 +69,19 @@ when we reasonably increase n. Because, interestingly if n gets too big, first o
 increase exponentially but we greatly reduce the probability of each ngram and we start to ignore
 many grams because we have never seen them before. A bigger dataset could potentially help but
 having n = 4 or 5 is sufficient enough with the data we have.
+
+Comments:
+- Q1: Answer is fine.  Looks good.
+
+- Q2: Not quite right.  More data just for Indonesian just makes the
+  calculations more accurate for Indonesian -- it can cause some
+  samples to switch from Indonesian to the other languages (if the
+  probability of that ngram goes down with more data.
+
+- Q3: Yes, but how would it impact accuracy or efficiency? These are
+  our concerns in IR.
+
+- Q4: Not quite right.  Lower-order ngrams makes the data more dense
+  too, which can have a positive effect on the language model. 
+  It's not the size of the potential vocabulary, but the distribution
+  differences that help us distinguish one choice from another.
