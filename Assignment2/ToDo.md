@@ -10,4 +10,4 @@
 - [X] Store the all documents list in the postings file
 - [X] Doc / further testing
 - [X] ESSAY
-- [ ] README
+- [X] README
