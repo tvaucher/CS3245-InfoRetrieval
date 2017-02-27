@@ -7,6 +7,10 @@ Largely facilitating the indexing of the documents. As it's on disk, it only
 use a very limited (and raisonnable) amount of memory. Once the computing of
 the index is done, the `shelf` is reduce using (c)Pickle to specified file:
 one for the dicitonary and one for the postings
+
+note: The shelve version is now commented replaced by a in-memory version
+because according to the newest post on IVLE, in memory indexing is perfectly
+fine. In further versions, better on disk indexing (like SPIMI) could be interesting.
 """
 #!/usr/bin/python
 
@@ -17,7 +21,7 @@ import sys
 import time
 import re
 from tuple_type import Entry
-from typing import Dict, Iterable, List, Set
+from typing import Dict, Iterable, List, Set, Union
 
 from nltk.stem import PorterStemmer
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -59,21 +63,21 @@ def generate_token(in_file: str) -> Set[str]:
                  for word in word_tokenize(sent)}}
 
 
-def add_token(shelf: shelve.Shelf, token: str, in_file: int):
+def add_token(dictionary: Union[shelve.Shelf, Dict[str, List[int]]], token: str, in_file: int):
     """
-    Add a specified token from a specified file in the temporary shelf
+    Add a specified token from a specified file in the in-memory dictionary
 
     *params*:
-        - shelf: The temporary shelf to add into
-        - token: The token to add into the shelf
+        - dictionary: The in-memory to add into
+        - token: The token to add into the dictionary
         - in_file: The file to which belong the token
     """
-    if token not in shelf:
-        shelf[token] = [in_file]
+    if token not in dictionary:
+        dictionary[token] = [in_file]
     else:
-        temp = shelf[token]
+        temp = dictionary[token]
         temp.append(in_file)
-        shelf[token] = temp
+        dictionary[token] = temp
 
 
 def cleanup(tempFilename: str):
@@ -104,28 +108,29 @@ def index(directory: str, dict_file: str, post_file: str):
         - dict_file: The file that will contain the Dictionary
         - post_file: The file that will contain the Postings
     """
-    tempFilename = 'tmp' + str(int(time.time()))
-    with shelve.open(tempFilename, flag="n") as shelf:
-        file_list = get_file_list(directory)  # [:10]
-        shelf['__all__'] = file_list
-        # Generate Dict
-        for in_file in file_list:
-            for token in generate_token(directory + str(in_file)):
-                add_token(shelf, token, in_file)
+    # tempFilename = 'tmp' + str(int(time.time()))
+    # with shelve.open(tempFilename, flag="n") as shelf:
+    shelf = dict()
+    file_list = get_file_list(directory)  # [:10]
+    shelf['__all__'] = file_list
+    # Generate Dict
+    for in_file in file_list:
+        for token in generate_token(directory + str(in_file)):
+            add_token(shelf, token, in_file)
 
-        # Write Postings
-        dictionary = dict()
-        with open(post_file, mode="wb") as postings_file:
-            for key, value in shelf.items():
-                offset = postings_file.tell()
-                size = postings_file.write(pickle.dumps(value))
-                dictionary[key] = Entry(len(value), offset, size)
+    # Write Postings
+    dictionary = dict()
+    with open(post_file, mode="wb") as postings_file:
+        for key, value in shelf.items():
+            offset = postings_file.tell()
+            size = postings_file.write(pickle.dumps(value))
+            dictionary[key] = Entry(len(value), offset, size)
 
-        # Write Dictionary
-        with open(dict_file, mode="wb") as dictionary_file:
-            pickle.dump(dictionary, dictionary_file)
+    # Write Dictionary
+    with open(dict_file, mode="wb") as dictionary_file:
+        pickle.dump(dictionary, dictionary_file)
 
-    cleanup(tempFilename)
+    # cleanup(tempFilename)
 
 
 def usage():

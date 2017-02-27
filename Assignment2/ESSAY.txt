@@ -16,7 +16,7 @@ But, not having them (the same apply for number) means that we have to take care
 3. The NLTK tokenizer may not correctly tokenize all terms. What do you observe from the resulting terms produced by sent_tokenize() and word_tokenize()? Can you propose rules to further refine these results?
 
 The tokenizer generally do a decent jobs separating the tokens, but I found two points where it struggles:
-- Due to the nature of our data, there's a lot of \n in the files. While generally doing ok with those, it painfully fails at tokenizing "government's\nbusiness" and the like, the output is government', busi after stemming. One can see that the indesirable hypen prevents a good stemming and a good indexation. Especially that hypens don't carry aren't really interesing to store by themselves.
+- Due to the nature of our data, there's a lot of \n in the files. While generally doing ok with those, it painfully fails at tokenizing "government's\nbusiness" and the like, the output is government', busi after stemming. One can see that the indesirable hypen prevents a good stemming and a good indexation. Especially that hypens aren't really interesing to store by themselves.
 - The other problem is more english related. All the words with a dash (e.g. director-general) are not separated and hence are stored in a weird not very useful stemmed form (e.g. director-gener). I think it would be more interesing to store director and general indepently rather than with the dash.
 
 Hence a simple solution lies in preprocessing the data. Simply replace the hypens and dashes by spaces, and the 2 previous issues are completly automatically fixed by the normal tokenizer.

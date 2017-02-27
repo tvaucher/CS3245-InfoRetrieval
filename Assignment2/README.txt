@@ -7,6 +7,8 @@ Email : E0025146@u.nus.edu
 Indexation part:
 As the optimization of the indexation part is not a critical point of the application, I decided to simplify my code by using `shelve` as an helping tool for keeping everything on disk (Except a small part cached on memory taken care of by Shelf). After going through all the documents of to index, the dictionary and postings file is written on disk and the temporary Shelf deleted. The postings are stored one list after another using pickle, and we keep track of there offset, size and frequency inside the dictionary that is itself then wrote on disk using pickle.
 
+NOTE: Actually, I left the shelf part in comment and use a simple in-memory dict because of an IVLE post stating that in-memory indexing was perfectily fine. The rest of the process remains the same.
+
 Skip pointers:
 I decided not to write my skip pointers on disk for two main reasons:
     - One that means that I would have to have a hand written complex data structure to store them. Which sounds like a bad idea since writting a complex data structre in anything but C sounds very inefficiant (know that we're using cPython and the core datastructure are written in a very efficiant C way)
