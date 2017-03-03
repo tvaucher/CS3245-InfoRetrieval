@@ -35,14 +35,9 @@ def search(dict_file: str, post_file: str, query_in: str, query_out: str):
         dictionary = pickle.load(dictionary_file)
         posting = Posting(dictionary, postings_file)
         file_list = posting['__all__']
-        first = True
         for query in q_in:
-            if not first:
-                q_out.write("\n")
-            else:
-                first = False
-            q_out.write(" ".join(map(str, shunting_yard_AST(tokenize(query))
-                                     .eval(posting, file_list).list)))
+            print(" ".join(map(str, shunting_yard_AST(tokenize(query))
+                               .eval(posting, file_list).list)), end='\n', file=q_out)
 def usage():
     """
     Print the usage of `search`
