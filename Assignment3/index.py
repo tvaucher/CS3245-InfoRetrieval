@@ -6,17 +6,18 @@ The filenames to index must be unique integers
 
 import getopt
 import os
-import shelve
+import re
 import sys
 import time
-import re
-from tuple_type import Entry
-from typing import Dict, Iterable, List, Set, Union
-from itertools import groupby
 from collections import defaultdict
+from itertools import groupby
+from typing import Dict, Iterable, List, Set, Union
 
 from nltk.stem import PorterStemmer
 from nltk.tokenize import sent_tokenize, word_tokenize
+
+from tuple_type import Entry, Term
+from utils import normalize, tf
 
 try:
     import cPickle as pickle
@@ -54,10 +55,10 @@ def generate_token(in_file: str) -> Set[str]:
                 [word for sent in sent_tokenize(file.read())  # (re.sub("[-']", " ", file.read()))
                  for word in word_tokenize(sent)]])
         document_length = len(document_terms)
-        return document_length, map(lambda x: (x[0], len(list(x[1]))), groupby(document_terms))
+        return document_length, [(x[0], len(list(x[1]))) for x in groupby(document_terms)]
 
 
-def add_token(dictionary: Dict[str, Dict[int, int]], token, in_file: int):
+def add_token(dictionary: Dict[str, Dict[int, int]], term, frequency, weight, in_file: int):
     """
     Add a specified token from a specified file in the in-memory dictionary
 
@@ -66,8 +67,7 @@ def add_token(dictionary: Dict[str, Dict[int, int]], token, in_file: int):
         - token: The token to add into the dictionary
         - in_file: The file to which belong the token
     """
-    (term, frequency) = token[0], token[1]
-    dictionary[term][in_file] = frequency
+    dictionary[term][in_file] = Term(frequency, weight)
 
 def index(directory: str, dict_file: str, post_file: str):
     """
@@ -85,13 +85,14 @@ def index(directory: str, dict_file: str, post_file: str):
 
     dict_builder = defaultdict(dict)
     dict_length = dict()
-    file_list = get_file_list(directory)# [:10]
+    file_list = get_file_list(directory)[:10]
     # Generate Dict
     for in_file in file_list:
         (doc_len, tokens) = generate_token(directory + str(in_file))
         dict_length[in_file] = doc_len
-        for token in tokens:
-            add_token(dict_builder, token, in_file)
+        weighted_tf = normalize([tf(y) for (x, y) in tokens])
+        for ((term, freq), w_tf) in zip(tokens, weighted_tf):
+            add_token(dict_builder, term, freq, w_tf, in_file)
 
     # Write Postings
     dict_term = dict()
