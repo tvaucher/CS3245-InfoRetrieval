@@ -1,6 +1,8 @@
 """
 This module is responsible of indexing a corpus of text inside a folder
 The filenames to index must be unique integers
+In this case we precompute the lnc weight for each document in order to
+save time during search, by trading it for some disk space
 """
 #!/usr/bin/python
 
@@ -11,7 +13,7 @@ import sys
 import time
 from collections import defaultdict
 from itertools import groupby
-from typing import Dict, Iterable, List, Set, Union
+from typing import Dict, Iterable, List, Tuple
 
 from nltk.stem import PorterStemmer
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -40,42 +42,31 @@ def get_file_list(directory: str) -> Iterable[int]:
     return sorted(map(int, os.listdir(directory)))
 
 
-def generate_token(in_file: str) -> Set[str]:
+def generate_token(in_file: str) -> List[Tuple[str, int]]:
     """
-    Generate the token for a specified file to be added in the Dictionary/Postings.
+    Generate the token and token frequency for a specified file
+    to be added in the Dictionary/Postings.
     Reads the file then apply tokenization (sentence, word), case folding and stemming
 
     *params*:
         - in_file: The file to generate the token for
     *return*:
-        - A Set[str] of the unique element to be added
+        - A list of tuple term, frequency for the file
     """
     with open(in_file, encoding="utf8") as file:
         document_terms = sorted([STEMMER.stem(w.lower()) for w in
-                [word for sent in sent_tokenize(file.read())  # (re.sub("[-']", " ", file.read()))
-                 for word in word_tokenize(sent)]])
-        document_length = len(document_terms)
-        return document_length, [(term, len(list(acc))) for (term, acc) in groupby(document_terms)]
+                                 [word for sent in sent_tokenize(file.read())
+                                  for word in word_tokenize(sent)]])
+        return [(term, len(list(acc))) for (term, acc) in groupby(document_terms)]
 
-
-def add_token(dictionary: Dict[str, Dict[int, int]], term, frequency, weight, in_file: int):
-    """
-    Add a specified token from a specified file in the in-memory dictionary
-
-    *params*:
-        - dictionary: The in-memory to add into
-        - token: The token to add into the dictionary
-        - in_file: The file to which belong the token
-    """
-    dictionary[term][in_file] = Term(frequency, weight)
 
 def index(directory: str, dict_file: str, post_file: str):
     """
     Core of the module. Index all the file of a specified directory into a couple
-    of Dictionary and Postings. The Dictionary stores the list of all the document
+    of Dictionary and Postings. The Dictionary stores the amount of documents
     and of the entries (with their frequency, offset in the postings and size (in bytes))
-    Whereas the Postings file stores the list of lists of documents. The postings are useless
-    without the Dictonary.
+    Whereas the Postings file stores the list of lists of tuple document, frequency.
+    The postings are useless without the Dictonary.
 
     *params*:
         - directory: The directory containing the file to index
@@ -84,13 +75,13 @@ def index(directory: str, dict_file: str, post_file: str):
     """
 
     dict_builder = defaultdict(dict)
-    file_list = get_file_list(directory) #[:10]
+    file_list = get_file_list(directory)  # [:10]
     # Generate Dict
     for in_file in file_list:
-        (doc_len, tokens) = generate_token(directory + str(in_file))
+        tokens = generate_token(directory + str(in_file))
         weighted_tf = normalize([tf(y) for (x, y) in tokens])
         for ((term, freq), w_tf) in zip(tokens, weighted_tf):
-            add_token(dict_builder, term, freq, w_tf, in_file)
+            dict_builder[term][in_file] = Term(freq, w_tf)
 
     # Write Postings
     dict_term = defaultdict(Entry)
@@ -104,6 +95,7 @@ def index(directory: str, dict_file: str, post_file: str):
     with open(dict_file, mode="wb") as dictionary_file:
         pickle.dump(len(file_list), dictionary_file)
         pickle.dump(dict_term, dictionary_file)
+
 
 def usage():
     """

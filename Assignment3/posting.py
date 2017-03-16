@@ -4,9 +4,9 @@ in order to get the value of the dictionary from the disk as you would do it
 for a normal dictionary.
 """
 
-from typing import Dict
+from typing import DefaultDict
 
-from tuple_type import Entry
+from tuple_type import Entry, Term
 
 try:
     import cPickle as pickle
@@ -20,7 +20,7 @@ class Posting(object):
     can access the postings on disk for a given entry
     """
 
-    def __init__(self, dictionary: Dict[str, Entry], post_file):
+    def __init__(self, dictionary: DefaultDict[str, Entry], post_file):
         """
         Initialize the datastructure given the dictionary and the postings file
 
@@ -31,9 +31,9 @@ class Posting(object):
         self.dictionary = dictionary
         self.post_file = post_file
 
-    def __getitem__(self, item: str):
+    def __getitem__(self, item: int) -> Term:
         """
-        Return the associated Skiplist to a key or an empty Skiplist
+        Return the associated Term to a key or an empty Term
         if there's no mapping in the dictionary
         """
         if item in self.dictionary:
@@ -41,4 +41,4 @@ class Posting(object):
             self.post_file.seek(value.offset)
             return pickle.loads(self.post_file.read(value.size))
         else:
-            return dict()
+            return Term(0, 0)

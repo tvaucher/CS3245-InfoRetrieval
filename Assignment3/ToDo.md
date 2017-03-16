@@ -1,4 +1,4 @@
 # ToDo
-- [ ] Implement search
+- [X] Implement search
 - [ ] Essay
 - [ ] Readme
