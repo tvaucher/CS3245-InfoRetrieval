@@ -6,6 +6,7 @@ This module was given by Min and most of the resources are accessible [here](www
 ## Content
 - Assignment 1 : A ngram based Language Model
 - Assignment 2 : A Boolean Retrieval indexation/search
+- Assignment 3 : A tf-idf ranked based indexation/search
 - Exercises : 4 Exercises from the Tutorial 0
     - Ex1 : A oneline word counter
     - Ex2 : A simple Paper/Scissors/Rock game
