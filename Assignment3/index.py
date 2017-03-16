@@ -55,7 +55,7 @@ def generate_token(in_file: str) -> Set[str]:
                 [word for sent in sent_tokenize(file.read())  # (re.sub("[-']", " ", file.read()))
                  for word in word_tokenize(sent)]])
         document_length = len(document_terms)
-        return document_length, [(x[0], len(list(x[1]))) for x in groupby(document_terms)]
+        return document_length, [(term, len(list(acc))) for (term, acc) in groupby(document_terms)]
 
 
 def add_token(dictionary: Dict[str, Dict[int, int]], term, frequency, weight, in_file: int):
@@ -84,18 +84,16 @@ def index(directory: str, dict_file: str, post_file: str):
     """
 
     dict_builder = defaultdict(dict)
-    dict_length = dict()
-    file_list = get_file_list(directory)[:10]
+    file_list = get_file_list(directory) #[:10]
     # Generate Dict
     for in_file in file_list:
         (doc_len, tokens) = generate_token(directory + str(in_file))
-        dict_length[in_file] = doc_len
         weighted_tf = normalize([tf(y) for (x, y) in tokens])
         for ((term, freq), w_tf) in zip(tokens, weighted_tf):
             add_token(dict_builder, term, freq, w_tf, in_file)
 
     # Write Postings
-    dict_term = dict()
+    dict_term = defaultdict(Entry)
     with open(post_file, mode="wb") as postings_file:
         for key, value in dict_builder.items():
             offset = postings_file.tell()
@@ -105,7 +103,6 @@ def index(directory: str, dict_file: str, post_file: str):
     # Write Dictionary
     with open(dict_file, mode="wb") as dictionary_file:
         pickle.dump(len(file_list), dictionary_file)
-        pickle.dump(dict_length, dictionary_file)
         pickle.dump(dict_term, dictionary_file)
 
 def usage():

@@ -7,4 +7,5 @@ Tuples:
 from collections import namedtuple
 
 Entry = namedtuple("Entry", ['frequency', 'offset', 'size'])
+Entry.__new__.__defaults__ = (0, 0, 0)
 Term = namedtuple("Term", ['frequency', 'weight'])
