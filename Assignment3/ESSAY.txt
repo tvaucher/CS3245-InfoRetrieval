@@ -1,0 +1,39 @@
+=== ESSAY QUESTIONS ===
+
+1. Phrasal queries
+If we can easily access the documents in the search part (which would imply linking the reuters folder in our case),
+we could easily take the list of documents that have a score > 0, open them and then check if they exactly contain the query inside them.
+We could be doing that way in order to support both phrasal queries and full text queries, but if we want the phrasal queries
+to appear first (as they would do on Google for example), we could add "1" to the score as the cosine similarity is at most 1, making the
+matching phrasal queries appear first.
+
+Else, if we can't access the documents (on a distant server, ...) we could, similarly to Boolean search, keep track of the positional
+index of the terms inside the documents (trading off for disk-space). Then after the current scoring, we could use the those positional
+index to check for each document if it is matching the phrasal query (eg: if the query is "University Town", we would look for the term University
+at pos `x` and Town at pos `x + 1`). Then, we could add "1" as done previously.
+
+NB: If we want only phrasal queries using VSM, instead of adding "1", we could simply decide to only keep the one matching the phrasal query and
+still output them in their ranking order
+
+2.  long documents and long queries as compared to short documents and queries
+Obviously as the queries are longer, it takes more time to retrieve the documents compared to short documents
+Furthermore, long documents and queries tend to have more terms, thus have a bigger tf per term but also a bigger number of different terms.
+Hence, as we normalize the tf-idf vector, we lose information about the length of the document and we tend to have a lower weight per term (due to the diversity)
+for long documents/query compared to short documents/query.
+This imply that if we have a short query, short document tend to be retrieved more easily than long document because their weight per term is usually higher.
+But for long queries, as they tend to have more terms, longer documents with more matching terms tend to be retrieved first (as they cumulated score is closer).
+
+6.4.4 suggests to improve the normalization, by not unformaly selecting the euclidian length for the normalization but rather, but a value slightly smaller for large
+document and bigger for small document, in order to better map the relevance in function of the length. But, in our case, we can say that using the euclidiant distance
+is enough for giving a decent relevance and hence the lnc.ltc scheme is sufficient.
+
+We said that lnc.ltc is sufficient for our collection, then ltc.lnc is kind of similar in the sense that we still give some weight to the rarity of a term (idf weight)
+in this model. This would lead to similar results to lnc.ltc, but would require more compute time as we need to compute idf for each term of each document (in our case
+at indexation time), rather than only on the query at search time. Hence, ltc.lnc would be sufficient.
+
+3. Use of metadata
+If we assume that most of them have metadata, that the search doesn't need to retrieve 100% of the documents (in case if a field is missing) and that we couple those metadata
+with the current tf-idf ranking we already have, we can say that zone and field can be interesting.
+Zones may be particularly interesting because the Title zone, usually encompass most of the themes that will be discussed in the article and hence could be given
+higher weights or importance. Fields could be interesting for the dates for exemple, allowing to look for articles in a given period of time allowing to prune some
+of the results.
