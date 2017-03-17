@@ -4,10 +4,9 @@ the queries contained in a files using a dictionary and a postings file as well
 as the lnc.ltc tf-idf logic for ranking
 """
 
-import getopt
+import argparse
 import sys
 from collections import Counter
-# import time
 from itertools import groupby
 
 from nltk.stem import PorterStemmer
@@ -78,44 +77,18 @@ def search(dict_file: str, post_file: str, query_in: str, query_out: str):
             print(" ".join(map(str, query(q, dict_term, posting, amount_doc))),
                   end='\n', file=q_out)
 
-
-def usage():
-    """
-    Print the usage of `search`
-    """
-    print("usage: " + sys.argv[0] +
-          " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results")
-
-
 def main():
     """
     Main fonction of the module, check the argv and pass them to the index function
     """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", help="dictionary-file", required=True)
+    parser.add_argument("-p", help="postings-file", required=True)
+    parser.add_argument("-q", help="file-of-queries", required=True)
+    parser.add_argument("-o", help="output-file-of-results", required=True)
+    args = parser.parse_args()
 
-    dict_file = post_file = query_in = query_out = None
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'd:p:q:o:')
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
-    for o, a in opts:
-        if o == '-d':
-            dict_file = a
-        elif o == '-p':
-            post_file = a
-        elif o == '-q':
-            query_in = a
-        elif o == '-o':
-            query_out = a
-        else:
-            assert False, "unhandled option"
-    if dict_file is None or post_file is None or query_in is None or query_out is None:
-        usage()
-        sys.exit(2)
-
-    # t = time.perf_counter()
-    search(dict_file, post_file, query_in, query_out)
-    # print("search time", time.perf_counter() - t, "sec")
+    search(args.d, args.p, args.q, args.o)
 
 if __name__ == '__main__':
     main()

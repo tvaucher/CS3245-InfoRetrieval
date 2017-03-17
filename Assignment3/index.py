@@ -6,11 +6,9 @@ save time during search, by trading it for some disk space
 """
 #!/usr/bin/python
 
-import getopt
+import argparse
 import os
-import re
 import sys
-import time
 from collections import defaultdict
 from itertools import groupby
 from typing import Dict, Iterable, List, Tuple
@@ -96,41 +94,20 @@ def index(directory: str, dict_file: str, post_file: str):
         pickle.dump(len(file_list), dictionary_file)
         pickle.dump(dict_term, dictionary_file)
 
-
-def usage():
-    """
-    Print the usage of `index`
-    """
-    print("usage: " +
-          sys.argv[0] + " -i directory-of-documents -d dictionary-file -p postings-file")
-
-
 def main():
     """
     Main fonction of the module, check the argv and pass them to the index function
     """
-    directory = dict_file = post_file = None
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'i:d:p:')
-    except getopt.GetoptError as err:
-        usage()
-        sys.exit(2)
-    for o, a in opts:
-        if o == '-i':
-            directory = a
-        elif o == '-d':
-            dict_file = a
-        elif o == '-p':
-            post_file = a
-        else:
-            assert False, "unhandled option"
-    if directory is None or dict_file is None or post_file is None:
-        usage()
-        sys.exit(2)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", help="directory-of-documents", required=True)
+    parser.add_argument("-d", help="dictionary-file", required=True)
+    parser.add_argument("-p", help="postings-file", required=True)
+    args = parser.parse_args()
 
+    directory = args.i
     if not directory.endswith(DELIMITER):
         directory += DELIMITER
-    index(directory, dict_file, post_file)
+    index(directory, args.d, args.p)
 
 if __name__ == '__main__':
     main()
