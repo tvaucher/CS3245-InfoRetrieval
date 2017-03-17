@@ -6,15 +6,14 @@ as the lnc.ltc tf-idf logic for ranking
 
 import argparse
 import sys
-from collections import Counter
-from itertools import groupby
+from collections import Counter, defaultdict
+from typing import DefaultDict, Dict, List
 
 from nltk.stem import PorterStemmer
 
 from posting import Posting
-from utils import *
-from typing import Dict, DefaultDict, List
 from tuple_type import Entry, Term
+from utils import *
 
 try:
     import cPickle as pickle
@@ -41,12 +40,14 @@ def query(q: str, dictionary: DefaultDict[int, Entry], posting: Posting, n: int)
     *return*
         - A list with at most BEST_OF best document
     """
-    tokens_freq = [(term, len(list(acc))) for (term, acc) in
-                   groupby(sorted([STEMMER.stem(token.lower()) for token in q.split()]))]
+    query_terms = [STEMMER.stem(token.lower()) for token in q.split()]
+    term_len = defaultdict(int)
+    for term in query_terms:
+        term_len[term] += 1
     query_weight = normalize([tf(freq) * idf(n, dictionary[term].frequency)
-                              for (term, freq) in tokens_freq])
+                              for (term, freq) in term_len.items()])
     score = Counter()
-    for ((term, _), q_weight) in zip(tokens_freq, query_weight):
+    for ((term, _), q_weight) in zip(term_len.items(), query_weight):
         if q_weight > 0:
             for doc_id, (_, d_weight) in posting[term].items():
                 score[doc_id] += q_weight * d_weight
@@ -76,6 +77,7 @@ def search(dict_file: str, post_file: str, query_in: str, query_out: str):
         for q in q_in:
             print(" ".join(map(str, query(q, dict_term, posting, amount_doc))),
                   end='\n', file=q_out)
+
 
 def main():
     """

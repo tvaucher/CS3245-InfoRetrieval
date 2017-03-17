@@ -10,7 +10,6 @@ import argparse
 import os
 import sys
 from collections import defaultdict
-from itertools import groupby
 from typing import Dict, Iterable, List, Tuple
 
 from nltk.stem import PorterStemmer
@@ -52,10 +51,14 @@ def generate_token(in_file: str) -> List[Tuple[str, int]]:
         - A list of tuple term, frequency for the file
     """
     with open(in_file, encoding="utf8") as file:
-        document_terms = sorted([STEMMER.stem(w.lower()) for w in
+        document_terms = [STEMMER.stem(w.lower()) for w in
                                  [word for sent in sent_tokenize(file.read())
-                                  for word in word_tokenize(sent)]])
-        return [(term, len(list(acc))) for (term, acc) in groupby(document_terms)]
+                                  for word in word_tokenize(sent)]]
+        term_len = defaultdict(int)
+        for term in document_terms:
+            term_len[term] += 1
+        return term_len
+        # return [(term, len(list(acc))) for (term, acc) in groupby(document_terms)]
 
 
 def index(directory: str, dict_file: str, post_file: str):
@@ -77,8 +80,8 @@ def index(directory: str, dict_file: str, post_file: str):
     # Generate Dict
     for in_file in file_list:
         tokens = generate_token(directory + str(in_file))
-        weighted_tf = normalize([tf(y) for (x, y) in tokens])
-        for ((term, freq), w_tf) in zip(tokens, weighted_tf):
+        weighted_tf = normalize([tf(y) for (x, y) in tokens.items()])
+        for ((term, freq), w_tf) in zip(tokens.items(), weighted_tf):
             dict_builder[term][in_file] = Term(freq, w_tf)
 
     # Write Postings
