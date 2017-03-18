@@ -75,7 +75,7 @@ def search(dict_file: str, post_file: str, query_in: str, query_out: str):
         dict_term = pickle.load(dictionary_file)
         posting = Posting(dict_term, postings_file)
         for q in q_in:
-            print(" ".join(map(str, query(q, dict_term, posting, amount_doc))),
+            print(*query(q, dict_term, posting, amount_doc),
                   end='\n', file=q_out)
 
 
