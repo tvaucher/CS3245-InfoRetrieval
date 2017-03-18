@@ -7,7 +7,7 @@ as the lnc.ltc tf-idf logic for ranking
 import argparse
 import sys
 from collections import Counter, defaultdict
-from typing import DefaultDict, Dict, List
+from typing import DefaultDict, List
 
 from nltk.stem import PorterStemmer
 
@@ -84,10 +84,14 @@ def main():
     Main fonction of the module, check the argv and pass them to the index function
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", help="dictionary-file", required=True)
-    parser.add_argument("-p", help="postings-file", required=True)
-    parser.add_argument("-q", help="file-of-queries", required=True)
-    parser.add_argument("-o", help="output-file-of-results", required=True)
+    parser.add_argument("-d", metavar="dictionary-file",
+                        help="Filename path of the dictionary", required=True)
+    parser.add_argument("-p", metavar="postings-file",
+                        help="Filename path of the postings", required=True)
+    parser.add_argument("-q", metavar="file-of-queries",
+                        help="Filename path of the queries", required=True)
+    parser.add_argument("-o", metavar="out-file-results",
+                        help="Filename path for the output file", required=True)
     args = parser.parse_args()
 
     search(args.d, args.p, args.q, args.o)

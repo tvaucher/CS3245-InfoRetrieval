@@ -10,7 +10,7 @@ import argparse
 import os
 import sys
 from collections import defaultdict
-from typing import Dict, Iterable, List, Tuple
+from typing import Iterable, List, DefaultDict
 
 from nltk.stem import PorterStemmer
 from nltk.tokenize import sent_tokenize, word_tokenize
@@ -39,7 +39,7 @@ def get_file_list(directory: str) -> Iterable[int]:
     return sorted(map(int, os.listdir(directory)))
 
 
-def generate_token(in_file: str) -> List[Tuple[str, int]]:
+def generate_token(in_file: str)  -> DefaultDict[str, int]:
     """
     Generate the token and token frequency for a specified file
     to be added in the Dictionary/Postings.
@@ -52,13 +52,12 @@ def generate_token(in_file: str) -> List[Tuple[str, int]]:
     """
     with open(in_file, encoding="utf8") as file:
         document_terms = [STEMMER.stem(w.lower()) for w in
-                                 [word for sent in sent_tokenize(file.read())
-                                  for word in word_tokenize(sent)]]
+                          [word for sent in sent_tokenize(file.read())
+                           for word in word_tokenize(sent)]]
         term_len = defaultdict(int)
         for term in document_terms:
             term_len[term] += 1
         return term_len
-        # return [(term, len(list(acc))) for (term, acc) in groupby(document_terms)]
 
 
 def index(directory: str, dict_file: str, post_file: str):
@@ -97,14 +96,18 @@ def index(directory: str, dict_file: str, post_file: str):
         pickle.dump(len(file_list), dictionary_file)
         pickle.dump(dict_term, dictionary_file)
 
+
 def main():
     """
     Main fonction of the module, check the argv and pass them to the index function
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", help="directory-of-documents", required=True)
-    parser.add_argument("-d", help="dictionary-file", required=True)
-    parser.add_argument("-p", help="postings-file", required=True)
+    parser.add_argument("-i", metavar="directory-of-documents",
+                        help="Path to directory containing the documents to index", required=True)
+    parser.add_argument("-d", metavar="dictionary-file",
+                        help="Filename path for the output dictionary", required=True)
+    parser.add_argument("-p", metavar="postings-file",
+                        help="Filename path for the output postings", required=True)
     args = parser.parse_args()
 
     directory = args.i
